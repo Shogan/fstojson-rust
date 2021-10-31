@@ -1,0 +1,14 @@
+[package]
+name = "fstojson"
+version = "0.1.0"
+edition = "2021"
+description = "Traverses a target filesystem directory & outputs the collected hierarchy to JSON"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+indextree = { version = "4.3.1" }
+serde_indextree = "0.2.0"
+clap = "2.33.3"
+serde = {version = "1.0.130", features = ["derive"]}
+serde_json = {version = "1.0.68"}
