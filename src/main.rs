@@ -1,21 +1,21 @@
 use std::{
     fs::{self},
-    path::{Path},
-    io::{Error, ErrorKind}
+    io::{Error, ErrorKind},
+    path::Path,
 };
 
+use clap::{App, Arg};
 use indextree::{Arena, NodeId};
-use clap::{Arg, App};
-use serde_json::{to_string, to_string_pretty};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use serde_indextree::Node;
+use serde_json::{to_string, to_string_pretty};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct PathNode {
     name: String,
     relative_path: String,
     absolute_path: String,
-    node_type: String
+    node_type: String,
 }
 
 fn main() -> Result<(), Error> {
@@ -24,22 +24,28 @@ fn main() -> Result<(), Error> {
         .version(version)
         .author("Sean Duffy - https://github.com/shogan")
         .about("Traverses a target filesystem directory & outputs the collected hierarchy to JSON")
-        .arg(Arg::with_name("path")
-            .short("t")
-            .long("traverse")
-            .value_name("PATH")
-            .help("The directory path to traverse")
-            .required(true)
-            .index(1)
-            .takes_value(true))
-        .arg(Arg::with_name("p")
-            .short("p")
-            .multiple(false)
-            .help("Enable pretty JSON print output"))
-        .arg(Arg::with_name("r")
-            .short("r")
-            .multiple(false)
-            .help("Traverse hierarchy recursively"))
+        .arg(
+            Arg::with_name("path")
+                .short("t")
+                .long("traverse")
+                .value_name("PATH")
+                .help("The directory path to traverse")
+                .required(true)
+                .index(1)
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("p")
+                .short("p")
+                .multiple(false)
+                .help("Enable pretty JSON print output"),
+        )
+        .arg(
+            Arg::with_name("r")
+                .short("r")
+                .multiple(false)
+                .help("Traverse hierarchy recursively"),
+        )
         .get_matches();
 
     let pretty_print;
@@ -47,12 +53,12 @@ fn main() -> Result<(), Error> {
 
     match matches.occurrences_of("r") {
         0 => recursive = false,
-        1 | _ => recursive = true
+        1 | _ => recursive = true,
     }
 
     match matches.occurrences_of("p") {
         0 => pretty_print = false,
-        1 | _ => pretty_print = true
+        1 | _ => pretty_print = true,
     }
 
     if matches.value_of("path") != None {
@@ -69,12 +75,15 @@ fn main() -> Result<(), Error> {
                 name: directory_path.to_string(),
                 node_type: "Directory".to_string(),
                 relative_path: directory_path.to_string(),
-                absolute_path: absolute_path.display().to_string()
+                absolute_path: absolute_path.display().to_string(),
             });
 
             traverse(directory_path, arena, root_node, recursive)?;
             if pretty_print {
-                println!("{}", to_string_pretty(&Node::new(root_node, arena)).unwrap());
+                println!(
+                    "{}",
+                    to_string_pretty(&Node::new(root_node, arena)).unwrap()
+                );
             } else {
                 println!("{}", to_string(&Node::new(root_node, arena)).unwrap());
             }
@@ -82,19 +91,27 @@ fn main() -> Result<(), Error> {
             Ok(())
         } else {
             eprintln!("Invalid directory.");
-            Result::Err(
-                Error::new(ErrorKind::InvalidInput,
-                           "Invalid directory: ".to_string() + directory_path))
+            Result::Err(Error::new(
+                ErrorKind::InvalidInput,
+                "Invalid directory: ".to_string() + directory_path,
+            ))
         }
     } else {
-        Result::Err(Error::new(ErrorKind::InvalidInput, "No path provided.".to_string()))
+        Result::Err(Error::new(
+            ErrorKind::InvalidInput,
+            "No path provided.".to_string(),
+        ))
     }
 }
 
-fn traverse(path: &str, arena: &mut Arena<PathNode>, parent: NodeId, recursive: bool) -> Result<(), Error> {
+fn traverse(
+    path: &str,
+    arena: &mut Arena<PathNode>,
+    parent: NodeId,
+    recursive: bool,
+) -> Result<(), Error> {
     let dir_listing = get_directory_listing(path);
     for entry in dir_listing {
-
         let temp_path = Path::new(entry.as_str());
         let mut absolute_path = std::env::current_dir()?;
         absolute_path.push(temp_path);
@@ -104,7 +121,7 @@ fn traverse(path: &str, arena: &mut Arena<PathNode>, parent: NodeId, recursive: 
                 name: String::from(temp_path.file_name().unwrap().to_str().unwrap()),
                 relative_path: String::from(entry.as_str()),
                 absolute_path: absolute_path.display().to_string(),
-                node_type: String::from("Directory")
+                node_type: String::from("Directory"),
             });
 
             parent.append(dir_object, arena);
@@ -117,7 +134,7 @@ fn traverse(path: &str, arena: &mut Arena<PathNode>, parent: NodeId, recursive: 
                 name: String::from(temp_path.file_name().unwrap().to_str().unwrap()),
                 relative_path: String::from(entry.as_str()),
                 absolute_path: absolute_path.display().to_string(),
-                node_type: String::from("File")
+                node_type: String::from("File"),
             });
 
             parent.append(file_object, arena);
@@ -130,12 +147,6 @@ fn traverse(path: &str, arena: &mut Arena<PathNode>, parent: NodeId, recursive: 
 fn get_directory_listing(directory_path: &str) -> Vec<String> {
     fs::read_dir(directory_path)
         .unwrap()
-        .map(|x| {
-            x.unwrap()
-                .path()
-                .to_str()
-                .unwrap()
-                .to_string()
-        })
+        .map(|x| x.unwrap().path().to_str().unwrap().to_string())
         .collect()
 }
