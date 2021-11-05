@@ -88,7 +88,7 @@ fn main() -> Result<(), Error> {
             eprintln!("Invalid directory.");
             Result::Err(Error::new(
                 ErrorKind::InvalidInput,
-                "Invalid directory: ".to_string() + directory_path,
+                format!("Invalid directory: {}", directory_path),
             ))
         }
     } else {
