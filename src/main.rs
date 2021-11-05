@@ -15,7 +15,13 @@ struct PathNode {
     name: String,
     relative_path: String,
     absolute_path: String,
-    node_type: String,
+    node_type: NodeType,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+enum NodeType {
+    File,
+    Directory,
 }
 
 fn main() -> Result<(), Error> {
@@ -62,7 +68,7 @@ fn main() -> Result<(), Error> {
 
             let root_node = arena.new_node(PathNode {
                 name: directory_path.to_string(),
-                node_type: "Directory".to_string(),
+                node_type: NodeType::Directory,
                 relative_path: directory_path.to_string(),
                 absolute_path: absolute_path.display().to_string(),
             });
@@ -110,7 +116,7 @@ fn traverse(
                 name: String::from(temp_path.file_name().unwrap().to_str().unwrap()),
                 relative_path: String::from(entry.as_str()),
                 absolute_path: absolute_path.display().to_string(),
-                node_type: String::from("Directory"),
+                node_type: NodeType::Directory,
             });
 
             parent.append(dir_object, arena);
@@ -123,7 +129,7 @@ fn traverse(
                 name: String::from(temp_path.file_name().unwrap().to_str().unwrap()),
                 relative_path: String::from(entry.as_str()),
                 absolute_path: absolute_path.display().to_string(),
-                node_type: String::from("File"),
+                node_type: NodeType::File,
             });
 
             parent.append(file_object, arena);
