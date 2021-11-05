@@ -35,31 +35,21 @@ fn main() -> Result<(), Error> {
                 .takes_value(true),
         )
         .arg(
-            Arg::with_name("p")
+            Arg::with_name("pretty_print")
                 .short("p")
                 .multiple(false)
                 .help("Enable pretty JSON print output"),
         )
         .arg(
-            Arg::with_name("r")
+            Arg::with_name("recursive")
                 .short("r")
                 .multiple(false)
                 .help("Traverse hierarchy recursively"),
         )
         .get_matches();
 
-    let pretty_print;
-    let recursive;
-
-    match matches.occurrences_of("r") {
-        0 => recursive = false,
-        1 | _ => recursive = true,
-    }
-
-    match matches.occurrences_of("p") {
-        0 => pretty_print = false,
-        1 | _ => pretty_print = true,
-    }
+    let recursive = matches.is_present("recursive");
+    let pretty_print = matches.is_present("pretty_print");
 
     if matches.value_of("path") != None {
         let directory_path = matches.value_of("path").unwrap();
