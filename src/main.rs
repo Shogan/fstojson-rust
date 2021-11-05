@@ -51,8 +51,7 @@ fn main() -> Result<(), Error> {
     let recursive = matches.is_present("recursive");
     let pretty_print = matches.is_present("pretty_print");
 
-    if matches.value_of("path") != None {
-        let directory_path = matches.value_of("path").unwrap();
+    if let Some(directory_path) = matches.value_of("path") {
         let root_path = Path::new(directory_path);
 
         if root_path.is_dir() {
