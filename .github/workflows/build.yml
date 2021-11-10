@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CARGO_TERM_COLOR: always
-      BINARY_NAME: fstojson-rust
+      BINARY_NAME: fstojson
     steps:
     - uses: actions/checkout@v2
     - name: Set build version
